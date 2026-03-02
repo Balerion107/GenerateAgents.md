@@ -19,6 +19,8 @@ def test_parse_arguments_defaults():
         assert args.style == 'comprehensive'
         assert args.analyze_git_history is False
         assert args.model is None
+        assert args.api_base is None
+        assert args.api_key is None
 
 def test_parse_arguments_flags():
     """Test CLI flag parsing."""
@@ -27,7 +29,9 @@ def test_parse_arguments_flags():
         '--github-repository', 'https://github.com/foo/bar',
         '--style', 'strict',
         '--analyze-git-history',
-        '--model', 'openai'
+        '--model', 'openai',
+        '--api-base', 'http://localhost:11434',
+        '--api-key', 'secret-key'
     ]
     with mock.patch.object(sys, 'argv', test_args):
         args = parse_arguments()
@@ -35,6 +39,8 @@ def test_parse_arguments_flags():
         assert args.style == 'strict'
         assert args.analyze_git_history is True
         assert args.model == 'openai'
+        assert args.api_base == 'http://localhost:11434'
+        assert args.api_key == 'secret-key'
 
 def test_resolve_repository_target_github():
     """Test resolving a github repository from args."""

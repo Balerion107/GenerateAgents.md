@@ -98,13 +98,19 @@ def init_environment():
     load_dotenv(find_dotenv(usecwd=True))
 
 
-def setup_language_model(model_arg):
+def setup_language_model(model_arg, api_base=None, api_key=None):
     """Initializes and configures the language models."""
     logging.info("Initializing DSPy configuration...")
-    model_cfg = resolve_model_config(model_arg)
+    model_cfg = resolve_model_config(model_arg, api_base, api_key)
     logging.info(f"Using model: {model_cfg.model}")
 
-    lm = dspy.LM(model_cfg.model)
+    kwargs = {}
+    if model_cfg.api_base:
+        kwargs['api_base'] = model_cfg.api_base
+    if model_cfg.api_key:
+        kwargs['api_key'] = model_cfg.api_key
+
+    lm = dspy.LM(model_cfg.model, **kwargs)
         
     dspy.configure(lm=lm)
     return lm
@@ -171,7 +177,7 @@ def main():
 
     try:
         repo_url, local_path, repo_name = resolve_repository_target(args)
-        lm = setup_language_model(args.model)
+        lm = setup_language_model(args.model, api_base=getattr(args, 'api_base', None), api_key=getattr(args, 'api_key', None))
 
         with get_repository_context(repo_url=repo_url, local_path=local_path) as repo_dir:
             run_agents_md_pipeline(repo_dir, repo_name, lm, style=args.style, analyze_git_history=args.analyze_git_history)

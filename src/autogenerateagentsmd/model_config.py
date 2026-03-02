@@ -30,13 +30,19 @@ DEFAULT_MODELS: dict[str, str] = {
 # ---------------------------------------------------------------------------
 @dataclass
 class ModelConfig:
-    """Holds the resolved model name."""
+    """Holds the resolved model name and API configurations."""
     model: str
+    api_base: str | None = None
+    api_key: str | None = None
 
 
-def resolve_model_config(model_arg: str | None = None) -> ModelConfig:
+def resolve_model_config(
+    model_arg: str | None = None,
+    api_base: str | None = None,
+    api_key: str | None = None
+) -> ModelConfig:
     """
-    Build a ``ModelConfig`` from a CLI / env-var model argument.
+    Build a ``ModelConfig`` from CLI / env-var arguments.
 
     Accepted formats
     ~~~~~~~~~~~~~~~~
@@ -68,7 +74,9 @@ def resolve_model_config(model_arg: str | None = None) -> ModelConfig:
         model_name = model_arg
 
     return ModelConfig(
-        model=model_name
+        model=model_name,
+        api_base=api_base,
+        api_key=api_key
     )
 
 
@@ -96,6 +104,18 @@ def add_model_argument(parser: argparse.ArgumentParser) -> None:
             "'openai/gpt-5.2'. You can also pass just a provider name ('gemini', "
             "'anthropic', 'openai') to use its default model."
         ),
+    )
+    parser.add_argument(
+        "--api-base",
+        type=str,
+        default=None,
+        help="Optional API base URL for the LM (e.g. for local models like Ollama or vLLM).",
+    )
+    parser.add_argument(
+        "--api-key",
+        type=str,
+        default=None,
+        help="Optional API key for the LM. If not provided, it may be read from environment variables.",
     )
     parser.add_argument(
         "--list-models",

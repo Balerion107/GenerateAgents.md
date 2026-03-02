@@ -54,6 +54,9 @@ uv run autogenerateagentsmd /path/to/local/repo --model anthropic/claude-sonnet-
 uv run autogenerateagentsmd --github-repository https://github.com/pallets/flask --model openai/gpt-5.2
 uv run autogenerateagentsmd /path/to/local/repo --model ollama/llama3
 
+# Connect to a local provider (like Ollama or vLLM) using custom endpoints:
+uv run autogenerateagentsmd /path/to/local/repo --model ollama_chat/llama3.2:1b --api-base "http://localhost:11434" --api-key "optional-key"
+
 # Pass just a default catalog provider name (gemini, anthropic, openai)
 uv run autogenerateagentsmd /path/to/local/repo --model anthropic
 
@@ -218,6 +221,10 @@ GenerateAgents/
 GenerateAgents natively supports **ANY model supported by LiteLLM**! 
 
 **Important:** When passing a model string to the `--model` flag, you *must* explicitly provide it in the format `PROVIDER/MODEL_NAME` (e.g., `ollama/llama3`, `openrouter/anthropic/claude-3-opus`, `openai/gpt-4o`). This ensures LiteLLM appropriately maps the request to the correct provider API. Make sure the corresponding required environment variables are exported.
+
+You can also pass custom endpoints and API keys directly via the CLI, which is especially useful for local providers:
+* `--api-base`: Allows pointing to custom local LM endpoints (e.g., `http://localhost:11434` for Ollama).
+* `--api-key`: Explicitly pass an API key rather than relying on environment variables.
 
 For ease of use, we maintain a "Catalog" of default fallbacks. If you just pass the provider name, these are the models we use by default:
 
