@@ -33,7 +33,12 @@ def model_cfg():
 @pytest.fixture(scope="session")
 def lm(model_cfg):
     """Provide the primary DSPy language model."""
-    return dspy.LM(model_cfg.model)
+    kwargs = {}
+    if model_cfg.api_base:
+        kwargs['api_base'] = model_cfg.api_base
+    if model_cfg.api_key:
+        kwargs['api_key'] = model_cfg.api_key
+    return dspy.LM(model_cfg.model, **kwargs)
 
 
 

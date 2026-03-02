@@ -17,6 +17,8 @@ def test_resolve_model_config_defaults():
     with mock.patch.dict(os.environ, clear=True):
         config = resolve_model_config(None)
         assert config.model == DEFAULT_MODELS[PROVIDER_GEMINI]
+        assert config.api_base is None
+        assert config.api_key is None
 
 def test_resolve_model_config_with_env_var():
     """Test resolution falling back to AUTOSKILL_MODEL env var."""
@@ -32,9 +34,11 @@ def test_resolve_model_config_with_provider_string():
 def test_resolve_model_config_with_specific_litellm_string():
     """Test resolution passing a specific, non-catalog model string."""
     test_model = "ollama/llama3"
-    config = resolve_model_config(test_model)
+    config = resolve_model_config(test_model, api_base="http://localhost:11434", api_key="secret")
     # The config should simply echo back the model string since it's passing through to LiteLLM
     assert config.model == test_model
+    assert config.api_base == "http://localhost:11434"
+    assert config.api_key == "secret"
 
 def test_list_supported_models():
     """Test that list_supported_models returns a string containing the defaults."""
@@ -58,3 +62,8 @@ def test_add_model_argument():
     # Test list models flag
     args = parser.parse_args(["--list-models"])
     assert args.list_models is True
+
+    # Test api base and api key
+    args = parser.parse_args(["--api-base", "http://localhost:11434", "--api-key", "test-key"])
+    assert args.api_base == "http://localhost:11434"
+    assert args.api_key == "test-key"
